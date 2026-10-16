@@ -190,7 +190,9 @@
       const tensorsFor = (subset, augment=false) => {
         const rows=subset.map(r=>decoded[all.indexOf(r)]);
         if(augment) rows.push(...rows.map(row=>({...row,values:augmentPixels(row.values)})));
-        const xs=tf.tensor4d(rows.map(r=>r.values),[rows.length,IMG_SIZE,IMG_SIZE,3]);
+        const pixelCount=IMG_SIZE*IMG_SIZE*3, flat=new Float32Array(rows.length*pixelCount);
+        rows.forEach((r,i)=>flat.set(r.values,i*pixelCount));
+        const xs=tf.tensor4d(flat,[rows.length,IMG_SIZE,IMG_SIZE,3]);
         const ys=tf.tensor2d(rows.map(r=>[r.label]),[rows.length,1]); tensors.push(xs,ys); return {xs,ys,rows};
       };
       const train=tensorsFor(splits.train,true), val=tensorsFor(splits.validation), test=tensorsFor(splits.test);
