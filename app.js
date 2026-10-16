@@ -234,7 +234,7 @@
   async function copySummary() { try { await navigator.clipboard.writeText(getReportText()); els.feedback.textContent='Summary copied'; } catch { els.feedback.textContent='Clipboard unavailable in this browser'; } }
   async function predict(file) {
     if(!model||!file)return; els.prediction.textContent='Analyzing image…';
-    try { const item=await readTensor({file,name:file.name,label:0,group:'prediction'}); const x=tf.tensor4d([item.values],[1,IMG_SIZE,IMG_SIZE,3]); const out=model.predict(x); const score=(await out.data())[0]; x.dispose();out.dispose(); const positive=score>=.5, confidence=positive?score:1-score; els.prediction.innerHTML=`Prediction: <strong>${positive?'Defective':'Normal'}</strong> · ${pct(confidence)} confidence`; els.prediction.classList.add('prediction-ready'); }
+    try { const item=await readTensor({file,name:file.name,label:0,group:'prediction'}); const x=tf.tensor4d(item.values,[1,IMG_SIZE,IMG_SIZE,3]); const out=model.predict(x); const score=(await out.data())[0]; x.dispose();out.dispose(); const positive=score>=.5, confidence=positive?score:1-score; els.prediction.innerHTML=`Prediction: <strong>${positive?'Defective':'Normal'}</strong> · ${pct(confidence)} confidence`; els.prediction.classList.add('prediction-ready'); }
     catch(e){els.prediction.textContent=e.message||'Could not read this image.';}
   }
   els.input.addEventListener('change',e=>loadDataset([...e.target.files]));
